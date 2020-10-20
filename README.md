@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
   include RenderJsonRails::Concern
 
   render_json_config name: :user,
-                     except: [:account_id, id],
+                     except: [:account_id, :id],
                      default_fields: [:login, :email, :calculated_age],
                      allowed_methods: [:calculated_age],
                      includes: {
