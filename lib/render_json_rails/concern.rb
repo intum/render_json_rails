@@ -25,9 +25,12 @@ module RenderJsonRails
         options = {}
         if fields && fields[name].present?
           options[:only] = fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| !except.include?(el) }
-          options[:methods] = methods&.find_all { |el| options[:only].include?(el.to_s) }
+          options[:methods] = methods&.find_all { |el| options[:only].include?(el) }
           if allowed_methods
-            options[:methods] = (options[:methods] || []) | allowed_methods.find_all { |el| options[:only].include?(el.to_s) }
+            options[:methods] = (options[:methods] || []) | allowed_methods.find_all { |el| options[:only].include?(el) }
+          end
+          if options[:methods].present? && options[:only].present?
+            options[:methods].each { |method| options[:only].delete(method) }
           end
         else
           options[:except] = except
@@ -43,8 +46,15 @@ module RenderJsonRails
       def render_json_options(includes: nil, fields: nil, additional_config: nil)
         raise "należy skonfigurowac render_json metodą: render_json_config" if !defined?(@render_json_config)
 
+        name = @render_json_config[:name].to_s
+
+        if (fields.blank? || fields[name].blank?) && @render_json_config[:default_fields].present?
+          fields ||= {}
+          fields[name] = @render_json_config[:default_fields].join(',')
+        end
+
         options = default_json_options(
-          name: @render_json_config[:name].to_s,
+          name: name,
           fields: fields,
           except: @render_json_config[:except],
           methods: @render_json_config[:methods],
@@ -65,7 +75,7 @@ module RenderJsonRails
 
         options = RenderJsonRails::Concern.deep_meld(options, additional_config) if additional_config
 
-        options.delete(:methods) if options[:methods] == nil
+        options.delete(:methods) if options[:methods].blank?
 
         options
       end # render_json_options
