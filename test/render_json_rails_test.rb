@@ -33,6 +33,15 @@ class DefaultFieldsModel
                      allowed_methods: [:calculate1, :calculate2]
 end
 
+class DefaultFieldsModelWithOnly
+
+  include RenderJsonRails::Concern
+  render_json_config name: :default_fields_model_with_only,
+                     default_fields: [:id, :account_id, :calculate1, :name],
+                     only: [:id, :name],
+                     allowed_methods: [:calculate1, :calculate2]
+end
+
 class RenderJsonRailsTest < Minitest::Test
   def test_that_it_has_a_version_number
     refute_nil RenderJsonRails::VERSION
@@ -76,6 +85,16 @@ class RenderJsonRailsTest < Minitest::Test
 
     out = DefaultFieldsModel.render_json_options(fields: { "default_fields_model" => "id,account_id,kind,user,calculate2"})
     expected = { only: [:id, :kind, :user], methods: [:calculate2] }
+    assert_equal expected, out, "out: #{out}"
+  end
+
+  def test_default_fields_model_with_only
+    out = DefaultFieldsModelWithOnly.render_json_options()
+    expected = { only: [:id, :name], methods: [:calculate1] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = DefaultFieldsModelWithOnly.render_json_options(fields: { "default_fields_model_with_only" => "id,account_id,kind,user,calculate2"})
+    expected = { only: [:id], methods: [:calculate2] }
     assert_equal expected, out, "out: #{out}"
   end
 end

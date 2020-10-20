@@ -17,14 +17,17 @@ module RenderJsonRails
       #  zostaną one wyświelone w json-ie
       # TODO:
       # [ ] spradzanie czy parametry "fields" i "include" sa ok i jesli nie to error
-      def default_json_options(name:, fields: nil, except: nil, methods: nil, allowed_methods: nil)
+      def default_json_options(name:, fields: nil, only: nil, except: nil, methods: nil, allowed_methods: nil)
         # name ||= self.name.underscore.gsub('/', '_')
         # raise self.name.underscore.gsub('/', '_')
-        except ||= [:account_id, :agent, :ip]
+        # except ||= [:account_id, :agent, :ip]
 
         options = {}
         if fields && fields[name].present?
-          options[:only] = fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| !except.include?(el) }
+          options[:only] = fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| !except&.include?(el) }
+          if only.present?
+            options[:only] = options[:only].find_all { |el| only.include?(el) || allowed_methods&.include?(el) || methods&.include?(el) }
+          end
           options[:methods] = methods&.find_all { |el| options[:only].include?(el) }
           if allowed_methods
             options[:methods] = (options[:methods] || []) | allowed_methods.find_all { |el| options[:only].include?(el) }
@@ -34,6 +37,7 @@ module RenderJsonRails
           end
         else
           options[:except] = except
+          options[:only] = only if only.present?
           options[:methods] = methods
         end
         options
@@ -56,6 +60,7 @@ module RenderJsonRails
         options = default_json_options(
           name: name,
           fields: fields,
+          only: @render_json_config[:only],
           except: @render_json_config[:except],
           methods: @render_json_config[:methods],
           allowed_methods: @render_json_config[:allowed_methods]
