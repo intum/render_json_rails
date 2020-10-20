@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
 
   render_json_config name: :user,
                      except: [:account_id, :id],
+                     # only: [:login, :email], # jesli wolelibyśmy wymienić pola zamiast je wykluczać przy pomocy "except"
                      default_fields: [:login, :email, :calculated_age],
                      allowed_methods: [:calculated_age],
                      includes: {
@@ -74,10 +75,10 @@ http://example.text/teams/1.json?fields[team]=name,description&fields[user]=emai
 ```ruby
 render_json_config name: :team,
   except: [:account_id, :config], # tych pól nie będzie w json-ie
-  only: [:id, :name], # tylko te pola będą w jsonie (wymiennie z except)
+  only: [:id, :name], # dozwolone pola będą w jsonie (wymiennie z except)
+  methods: [:image], # dozwolone i domyślnie wyświetlone metody, ten parametr warto uzywac tylko, gdy nie ma parametru "default_fields" - przy ustawionym "default_fields" trzeba metody wymienic w allowed_methods
   default_fields: [:id, :name, :members], # domyślnie wyświetlone pola + metody
-  methods: [:image], # ten parametr warto uzywac tylko, gdy nie ma parametru "default_fields" - przy ustawionym "default_fields" trzeba metody wymienic w allowed_methods
-  allowed_methods: [:members], # te metody mogą być dodane przez parametr fileds np: fields[team]=id,members
+  allowed_methods: [:members], # dozwolone metody, mogą być dodane przez parametr fileds np: fields[team]=id,members
   includes: { # to mozna dołączać za pomoca parametru include np include=users,category
    users: Users,
    category: Category
