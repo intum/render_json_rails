@@ -67,7 +67,8 @@ http://example.text/teams/1.json?fields[team]=name,description&fields[user]=emai
 ```ruby
 render_json_config name: :team,
   except: [:account_id, :config], # tych pól nie będzie w json-ie
-  methods: [:image], # te metody zostaną dołączone
+  default_fields: [:id, :name, :members],
+  methods: [:image], # ten parametr warto uzywac tylko, gdy nie ma parametru "default_fields" - przy ustawionym "default_fields" trzeba metody wymienic w allowed_methods
   allowed_methods: [:members], # te metody mogą być dodane przez parametr fileds np: fields[team]=id,members
   includes: { # to mozna dołączać za pomoca parametru include np include=users,category
    users: Users,
