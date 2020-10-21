@@ -4,14 +4,14 @@ class TestModel1
   include RenderJsonRails::Concern
   render_json_config name: :model1,
                      except: [:account_id],
-                     allowed_methods: [:calculate0]
+                     allowed_methods: [:calculated0]
 end
 
 class TestModel2
   include RenderJsonRails::Concern
   render_json_config name: :model2,
                      except: [:account_id],
-                     methods: [:calculate1],
+                     methods: [:calculated1],
                      includes: {
                        test_model1: TestModel1,
                      }
@@ -21,8 +21,8 @@ class TestModel3
   include RenderJsonRails::Concern
   render_json_config name: :model3,
                      except: [:account_id],
-                     methods: [:calculate1],
-                     allowed_methods: [:calculate2],
+                     methods: [:calculated1],
+                     allowed_methods: [:calculated2],
                      includes: {
                        test_model2: TestModel2,
                      }
@@ -31,17 +31,17 @@ end
 class DefaultFieldsModel
   include RenderJsonRails::Concern
   render_json_config name: :default_fields_model,
-                     default_fields: [:id, :account_id, :calculate1, :name],
+                     default_fields: [:id, :account_id, :calculated1, :name],
                      except: [:account_id],
-                     allowed_methods: [:calculate1, :calculate2]
+                     allowed_methods: [:calculated1, :calculated2]
 end
 
 class DefaultFieldsModelWithOnly
   include RenderJsonRails::Concern
   render_json_config name: :default_fields_model_with_only,
-                     default_fields: [:id, :account_id, :calculate1, :name],
+                     default_fields: [:id, :account_id, :calculated1, :name],
                      only: [:id, :name],
-                     allowed_methods: [:calculate1, :calculate2]
+                     allowed_methods: [:calculated1, :calculated2]
 end
 
 class RenderJsonRailsTest < Minitest::Test
@@ -61,22 +61,22 @@ class RenderJsonRailsTest < Minitest::Test
 
   def test_model2
     out = TestModel2.render_json_options
-    expected = { except: [:account_id], methods: [:calculate1] }
+    expected = { except: [:account_id], methods: [:calculated1] }
     assert_equal expected, out, "out: #{out}"
 
     out = TestModel2.render_json_options(fields: {
-      "model2" => " id ,account_id,name,calculate1",
+      "model2" => " id ,account_id,name,calculated1",
     })
-    expected = { only: [:id, :name], methods: [:calculate1] }
+    expected = { only: [:id, :name], methods: [:calculated1] }
     assert_equal expected, out, "out: #{out}"
 
     out = TestModel2.render_json_options(
-      fields: { "model2" => " id ,account_id,name,calculate1" },
+      fields: { "model2" => " id ,account_id,name,calculated1" },
       includes: ['test_model1']
     )
     expected = {
       only: [:id, :name],
-      methods: [:calculate1],
+      methods: [:calculated1],
       include: [
         { test_model1: { except: [:account_id] } },
       ],
@@ -85,14 +85,14 @@ class RenderJsonRailsTest < Minitest::Test
 
     out = TestModel2.render_json_options(
       fields: {
-        "model2" => " id ,account_id,name,calculate1",
+        "model2" => " id ,account_id,name,calculated1",
         "model1" => "id,account_id,  name",
       },
       includes: ['test_model1']
     )
     expected = {
       only: [:id, :name],
-      methods: [:calculate1],
+      methods: [:calculated1],
       include: [
         { test_model1: { only: [:id, :name] } },
       ],
@@ -102,32 +102,32 @@ class RenderJsonRailsTest < Minitest::Test
 
   def test_model3
     out = TestModel3.render_json_options
-    expected = { except: [:account_id], methods: [:calculate1] }
+    expected = { except: [:account_id], methods: [:calculated1] }
     assert_equal expected, out, "out: #{out}"
 
-    out = TestModel3.render_json_options(fields: { "model3" => "id,account_id, name,calculate2" })
-    expected = { only: [:id, :name], methods: [:calculate2] }
+    out = TestModel3.render_json_options(fields: { "model3" => "id,account_id, name,calculated2" })
+    expected = { only: [:id, :name], methods: [:calculated2] }
     assert_equal expected, out, "out: #{out}"
 
     out = TestModel3.render_json_options(
       fields: {
-        "model3" => "id,account_id, name,calculate2",
-        "model2" => " id,name,calculate1",
-        "model1" => " id1,name1,calculate0",
+        "model3" => "id,account_id, name,calculated2",
+        "model2" => " id,name,calculated1",
+        "model1" => " id1,name1,calculated0",
       },
       includes: ['test_model2', 'test_model2.test_model1']
     )
     expected = {
       only: [:id, :name],
-      methods: [:calculate2],
+      methods: [:calculated2],
       include: [{
         test_model2: {
           only: [:id, :name],
-          methods: [:calculate1],
+          methods: [:calculated1],
           include: [{
             test_model1: {
               only: [:id1, :name1],
-              methods: [:calculate0],
+              methods: [:calculated0],
             },
           }],
         },
@@ -138,23 +138,23 @@ class RenderJsonRailsTest < Minitest::Test
 
   def test_default_fields_model
     out = DefaultFieldsModel.render_json_options
-    expected = { only: [:id, :name], methods: [:calculate1] }
+    expected = { only: [:id, :name], methods: [:calculated1] }
     assert_equal expected, out, "out: #{out}"
 
-    out = DefaultFieldsModel.render_json_options(fields: { "default_fields_model" => "id,account_id,kind,user,calculate2" })
-    expected = { only: [:id, :kind, :user], methods: [:calculate2] }
+    out = DefaultFieldsModel.render_json_options(fields: { "default_fields_model" => "id,account_id,kind,user,calculated2" })
+    expected = { only: [:id, :kind, :user], methods: [:calculated2] }
     assert_equal expected, out, "out: #{out}"
   end
 
   def test_default_fields_model_with_only
     out = DefaultFieldsModelWithOnly.render_json_options
-    expected = { only: [:id, :name], methods: [:calculate1] }
+    expected = { only: [:id, :name], methods: [:calculated1] }
     assert_equal expected, out, "out: #{out}"
 
     out = DefaultFieldsModelWithOnly.render_json_options(fields: {
-      "default_fields_model_with_only" => "id,account_id,kind,user,calculate2",
+      "default_fields_model_with_only" => "id,account_id,kind,user,calculated2",
     })
-    expected = { only: [:id], methods: [:calculate2] }
+    expected = { only: [:id], methods: [:calculated2] }
     assert_equal expected, out, "out: #{out}"
   end
 end
