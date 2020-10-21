@@ -26,7 +26,9 @@ module RenderJsonRails
         if fields && fields[name].present?
           options[:only] = fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| !except&.include?(el) }
           if only.present?
-            options[:only] = options[:only].find_all { |el| only.include?(el) || allowed_methods&.include?(el) || methods&.include?(el) }
+            options[:only] = options[:only].find_all do |el|
+              only.include?(el) || allowed_methods&.include?(el) || methods&.include?(el)
+            end
           end
           options[:methods] = methods&.find_all { |el| options[:only].include?(el) }
           if allowed_methods
@@ -68,12 +70,12 @@ module RenderJsonRails
 
         if includes
           include_options = []
-          @render_json_config[:includes].each do |name, klass|
-            if includes.include?(name.to_s)
-              includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: name.to_s)
-              include_options << { name => klass.render_json_options(includes: includes2, fields: fields) }
+          @render_json_config[:includes]&.each do |name2, klass|
+            if includes.include?(name2.to_s)
+              includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: name2.to_s)
+              include_options << { name2 => klass.render_json_options(includes: includes2, fields: fields) }
             end
-          end if @render_json_config[:includes]
+          end
 
           options[:include] = include_options
         end
@@ -87,23 +89,15 @@ module RenderJsonRails
     end # class_methods
 
     def self.includes_for_model(includes:, model:)
-      includes = includes.map do |el|
-        if el.start_with?(model + '.')
-          el = el.gsub(/^#{model}\./, '')
-        else
-          el = nil
-        end
-      end
+      includes = includes.map { |el| el.gsub(/^#{model}\./, '') if el.start_with?(model + '.') }
       includes.find_all { |el| el.present? }
     end
 
-    private
-
-    def self.deep_meld(h1, h2)
-      h1.deep_merge(h2) do |key, this_val, other_val|
-        if this_val != nil && other_val == nil
+    def self.deep_meld(hh1, hh2)
+      hh1.deep_merge(hh2) do |_key, this_val, other_val|
+        if !this_val.nil? && other_val == nil
           this_val
-        elsif this_val == nil && other_val != nil
+        elsif this_val == nil && !other_val.nil?
           other_val
         elsif this_val.is_a?(Array) && other_val.is_a?(Array)
           this_val | other_val

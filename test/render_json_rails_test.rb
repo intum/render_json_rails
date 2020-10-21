@@ -4,9 +4,9 @@ class TestModel1
   include RenderJsonRails::Concern
   render_json_config name: :model1,
                      except: [:account_id]
-                    #  includes: {
-                    #    last_emails: Mail::Email,
-                    #  }
+  #  includes: {
+  #    last_emails: Mail::Email,
+  #  }
 end
 
 class TestModel2
@@ -25,7 +25,6 @@ class TestModel3
 end
 
 class DefaultFieldsModel
-
   include RenderJsonRails::Concern
   render_json_config name: :default_fields_model,
                      default_fields: [:id, :account_id, :calculate1, :name],
@@ -34,7 +33,6 @@ class DefaultFieldsModel
 end
 
 class DefaultFieldsModelWithOnly
-
   include RenderJsonRails::Concern
   render_json_config name: :default_fields_model_with_only,
                      default_fields: [:id, :account_id, :calculate1, :name],
@@ -44,11 +42,11 @@ end
 
 class RenderJsonRailsTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil RenderJsonRails::VERSION
+    assert_not_nil RenderJsonRails::VERSION
   end
 
   def test_model1
-    out = TestModel1.render_json_options()
+    out = TestModel1.render_json_options
     expected = { except: [:account_id] }
     assert_equal expected, out, "out: #{out}"
 
@@ -58,7 +56,7 @@ class RenderJsonRailsTest < Minitest::Test
   end
 
   def test_model2
-    out = TestModel2.render_json_options()
+    out = TestModel2.render_json_options
     expected = { except: [:account_id], methods: [:calculate1] }
     assert_equal expected, out, "out: #{out}"
 
@@ -68,7 +66,7 @@ class RenderJsonRailsTest < Minitest::Test
   end
 
   def test_model3
-    out = TestModel3.render_json_options()
+    out = TestModel3.render_json_options
     expected = { except: [:account_id], methods: [:calculate1] }
     assert_equal expected, out, "out: #{out}"
 
@@ -77,23 +75,24 @@ class RenderJsonRailsTest < Minitest::Test
     assert_equal expected, out, "out: #{out}"
   end
 
-
   def test_default_fields_model
-    out = DefaultFieldsModel.render_json_options()
+    out = DefaultFieldsModel.render_json_options
     expected = { only: [:id, :name], methods: [:calculate1] }
     assert_equal expected, out, "out: #{out}"
 
-    out = DefaultFieldsModel.render_json_options(fields: { "default_fields_model" => "id,account_id,kind,user,calculate2"})
+    out = DefaultFieldsModel.render_json_options(fields: { "default_fields_model" => "id,account_id,kind,user,calculate2" })
     expected = { only: [:id, :kind, :user], methods: [:calculate2] }
     assert_equal expected, out, "out: #{out}"
   end
 
   def test_default_fields_model_with_only
-    out = DefaultFieldsModelWithOnly.render_json_options()
+    out = DefaultFieldsModelWithOnly.render_json_options
     expected = { only: [:id, :name], methods: [:calculate1] }
     assert_equal expected, out, "out: #{out}"
 
-    out = DefaultFieldsModelWithOnly.render_json_options(fields: { "default_fields_model_with_only" => "id,account_id,kind,user,calculate2"})
+    out = DefaultFieldsModelWithOnly.render_json_options(fields: {
+      "default_fields_model_with_only" => "id,account_id,kind,user,calculate2",
+    })
     expected = { only: [:id], methods: [:calculate2] }
     assert_equal expected, out, "out: #{out}"
   end
