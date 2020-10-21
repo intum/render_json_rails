@@ -76,9 +76,11 @@ include mogą być zagnieżdżane (po kropce)
 http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
 ```
 
+## Wiecej przykładów użycia
+
 Więcej przykładów jest w testach: [test/render_json_rails_test.rb](test/render_json_rails_test.rb)
 
-## Pełny opis ```render_json_config```
+## Wszystkie opcje ```render_json_config```
 
 ```ruby
 render_json_config name: :team,
@@ -87,7 +89,7 @@ render_json_config name: :team,
   methods: [:image], # dozwolone i domyślnie wyświetlone metody, ten parametr warto uzywac tylko, gdy nie ma parametru "default_fields" - przy ustawionym "default_fields" trzeba metody wymienic w allowed_methods
   default_fields: [:id, :name, :members], # domyślnie wyświetlone pola + metody
   allowed_methods: [:members], # dozwolone metody, mogą być dodane przez parametr fileds np: fields[team]=id,members
-  includes: { # to mozna dołączać za pomoca parametru include np include=users,category
+  includes: { # to mozna dołączać za pomoca parametru include np include=users,category,users.roles
    users: Users,
    category: Category
   }
