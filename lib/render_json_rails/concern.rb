@@ -49,28 +49,34 @@ module RenderJsonRails
         @render_json_config = config
       end
 
-      def render_json_options(includes: nil, fields: nil, additional_config: nil)
+      def render_json_options(includes: nil, fields: nil, override_render_json_config: nil, additional_config: nil)
         raise "należy skonfigurowac render_json metodą: render_json_config" if !defined?(@render_json_config)
 
-        name = @render_json_config[:name].to_s
+        if override_render_json_config
+          current_json_config = @render_json_config.merge(override_render_json_config)
+        else
+          current_json_config = @render_json_config
+        end
 
-        if (fields.blank? || fields[name].blank?) && @render_json_config[:default_fields].present?
+        name = current_json_config[:name].to_s
+
+        if (fields.blank? || fields[name].blank?) && current_json_config[:default_fields].present?
           fields ||= {}
-          fields[name] = @render_json_config[:default_fields].join(',')
+          fields[name] = current_json_config[:default_fields].join(',')
         end
 
         options = default_json_options(
           name: name,
           fields: fields,
-          only: @render_json_config[:only],
-          except: @render_json_config[:except],
-          methods: @render_json_config[:methods],
-          allowed_methods: @render_json_config[:allowed_methods]
+          only: current_json_config[:only],
+          except: current_json_config[:except],
+          methods: current_json_config[:methods],
+          allowed_methods: current_json_config[:allowed_methods]
         )
 
         if includes
           include_options = []
-          @render_json_config[:includes]&.each do |model_name, klass|
+          current_json_config[:includes]&.each do |model_name, klass|
             if includes.include?(model_name.to_s)
               includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: model_name.to_s)
               include_options << { model_name => klass.render_json_options(includes: includes2, fields: fields) }

@@ -17,7 +17,7 @@ module RenderJsonRails
     # fields[invoice]=number,sales_code
     # fields[invoice_position]=price_gross
     # include=positions
-    def render_json(object, additional_config: nil, status: nil, location: nil)
+    def render_json(object, override_render_json_config: nil, additional_config: nil, status: nil, location: nil)
       raise "objekt nie moze byc null" if object == nil
 
       if object.class.to_s.include?('ActiveRecord_Relation')
@@ -31,6 +31,7 @@ module RenderJsonRails
       options = class_object.render_json_options(
         includes: includes,
         fields: params[:fields],
+        override_render_json_config: override_render_json_config,
         additional_config: additional_config
       )
       if params[:formatted] && !Rails.env.development? || params[:formatted] != 'no' && Rails.env.development?

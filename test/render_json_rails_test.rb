@@ -157,4 +157,19 @@ class RenderJsonRailsTest < Minitest::Test
     expected = { only: [:id], methods: [:calculated2] }
     assert_equal expected, out, "out: #{out}"
   end
+
+  def test_override_render_json_config
+    out = TestModel1.render_json_options
+    expected = { except: [:account_id] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = TestModel1.render_json_options(
+      override_render_json_config: {
+        only: [:id, :email],
+        default_fields: [:calculated0, :id, :email],
+      }
+    )
+    expected = { only: [:id, :email], methods: [:calculated0] }
+    assert_equal expected, out, "out: #{out}"
+  end
 end
