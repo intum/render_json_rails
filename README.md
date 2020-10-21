@@ -70,6 +70,14 @@ i możemy łączyć to z include
 http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&include=users
 ```
 
+include mogą być zagnieżdżane (po kropce)
+
+```html
+http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
+```
+
+Więcej przykładów jest w testach:
+
 ## Pełny opis ```render_json_config```
 
 ```ruby

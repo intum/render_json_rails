@@ -3,17 +3,18 @@ require "test_helper"
 class TestModel1
   include RenderJsonRails::Concern
   render_json_config name: :model1,
-                     except: [:account_id]
-  #  includes: {
-  #    last_emails: Mail::Email,
-  #  }
+                     except: [:account_id],
+                     allowed_methods: [:calculate0]
 end
 
 class TestModel2
   include RenderJsonRails::Concern
   render_json_config name: :model2,
                      except: [:account_id],
-                     methods: [:calculate1]
+                     methods: [:calculate1],
+                     includes: {
+                       test_model1: TestModel1,
+                     }
 end
 
 class TestModel3
@@ -21,7 +22,10 @@ class TestModel3
   render_json_config name: :model3,
                      except: [:account_id],
                      methods: [:calculate1],
-                     allowed_methods: [:calculate2]
+                     allowed_methods: [:calculate2],
+                     includes: {
+                       test_model2: TestModel2,
+                     }
 end
 
 class DefaultFieldsModel
@@ -42,7 +46,7 @@ end
 
 class RenderJsonRailsTest < Minitest::Test
   def test_that_it_has_a_version_number
-    assert_not_nil RenderJsonRails::VERSION
+    assert RenderJsonRails::VERSION.present?
   end
 
   def test_model1
@@ -60,8 +64,39 @@ class RenderJsonRailsTest < Minitest::Test
     expected = { except: [:account_id], methods: [:calculate1] }
     assert_equal expected, out, "out: #{out}"
 
-    out = TestModel2.render_json_options(fields: { "model2" => " id ,account_id,name,calculate1" })
+    out = TestModel2.render_json_options(fields: {
+      "model2" => " id ,account_id,name,calculate1",
+    })
     expected = { only: [:id, :name], methods: [:calculate1] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = TestModel2.render_json_options(
+      fields: { "model2" => " id ,account_id,name,calculate1" },
+      includes: ['test_model1']
+    )
+    expected = {
+      only: [:id, :name],
+      methods: [:calculate1],
+      include: [
+        { test_model1: { except: [:account_id] } },
+      ],
+    }
+    assert_equal expected, out, "out: #{out}"
+
+    out = TestModel2.render_json_options(
+      fields: {
+        "model2" => " id ,account_id,name,calculate1",
+        "model1" => "id,account_id,  name",
+      },
+      includes: ['test_model1']
+    )
+    expected = {
+      only: [:id, :name],
+      methods: [:calculate1],
+      include: [
+        { test_model1: { only: [:id, :name] } },
+      ],
+    }
     assert_equal expected, out, "out: #{out}"
   end
 
@@ -72,6 +107,32 @@ class RenderJsonRailsTest < Minitest::Test
 
     out = TestModel3.render_json_options(fields: { "model3" => "id,account_id, name,calculate2" })
     expected = { only: [:id, :name], methods: [:calculate2] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = TestModel3.render_json_options(
+      fields: {
+        "model3" => "id,account_id, name,calculate2",
+        "model2" => " id,name,calculate1",
+        "model1" => " id1,name1,calculate0",
+      },
+      includes: ['test_model2', 'test_model2.test_model1']
+    )
+    expected = {
+      only: [:id, :name],
+      methods: [:calculate2],
+      include: [{
+        test_model2: {
+          only: [:id, :name],
+          methods: [:calculate1],
+          include: [{
+            test_model1: {
+              only: [:id1, :name1],
+              methods: [:calculate0],
+            },
+          }],
+        },
+      }],
+    }
     assert_equal expected, out, "out: #{out}"
   end
 

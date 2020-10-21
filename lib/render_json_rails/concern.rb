@@ -70,14 +70,14 @@ module RenderJsonRails
 
         if includes
           include_options = []
-          @render_json_config[:includes]&.each do |name2, klass|
-            if includes.include?(name2.to_s)
-              includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: name2.to_s)
-              include_options << { name2 => klass.render_json_options(includes: includes2, fields: fields) }
+          @render_json_config[:includes]&.each do |model_name, klass|
+            if includes.include?(model_name.to_s)
+              includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: model_name.to_s)
+              include_options << { model_name => klass.render_json_options(includes: includes2, fields: fields) }
             end
           end
 
-          options[:include] = include_options
+          options[:include] = include_options if include_options.present?
         end
 
         options = RenderJsonRails::Concern.deep_meld(options, additional_config) if additional_config
