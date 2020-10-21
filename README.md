@@ -76,7 +76,7 @@ include mogą być zagnieżdżane (po kropce)
 http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
 ```
 
-Więcej przykładów jest w testach:
+Więcej przykładów jest w testach: [test/render_json_rails_test.rb](test/render_json_rails_test.rb) 
 
 ## Pełny opis ```render_json_config```
 
