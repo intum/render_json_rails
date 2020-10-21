@@ -54,6 +54,8 @@ module RenderJsonRails
 
         if override_render_json_config
           current_json_config = override_render_json_config # @render_json_config.merge(override_render_json_config)
+          current_json_config[:name] ||= @render_json_config[:name]
+          current_json_config[:default_fields] ||= @render_json_config[:default_fields]
         else
           current_json_config = @render_json_config
         end
