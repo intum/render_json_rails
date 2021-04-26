@@ -169,7 +169,27 @@ class RenderJsonRailsTest < Minitest::Test
         default_fields: [:calculated0, :id, :email],
       }
     )
-    expected = { only: [:id, :email], methods: [:calculated0] }
+    expected = { only: [:id, :email] }
+    assert_equal expected, out, "out: #{out}"
+  end
+
+  def test_additional_fields
+    out = DefaultFieldsModel.render_json_options(
+      additional_fields: { "default_fields_model" => "account_id,number,calculated2" }
+    )
+    expected = { only: [:id, :name, :number], methods: [:calculated1, :calculated2] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = TestModel1.render_json_options(
+      additional_fields: { "model1" => "calculated0" }
+    )
+    expected = { except: [:account_id], methods: [:calculated0] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = DefaultFieldsModelWithOnly.render_json_options(
+      additional_fields: {"default_fields_model_with_only" => "calculated2"}
+    )
+    expected = { only: [:id, :name], methods: [:calculated1, :calculated2] }
     assert_equal expected, out, "out: #{out}"
   end
 end

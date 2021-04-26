@@ -32,7 +32,8 @@ module RenderJsonRails
         includes: includes,
         fields: params[:fields],
         override_render_json_config: override_render_json_config,
-        additional_config: additional_config
+        additional_config: additional_config,
+        additional_fields: params[:additional_fields]
       )
       if params[:formatted] && !Rails.env.development? || params[:formatted] != 'no' && Rails.env.development?
         json = JSON.pretty_generate(object.as_json(options))
