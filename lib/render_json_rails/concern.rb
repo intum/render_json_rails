@@ -17,13 +17,16 @@ module RenderJsonRails
       #  zostaną one wyświelone w json-ie
       # TODO:
       # [ ] spradzanie czy parametry "fields" i "include" sa ok i jesli nie to error
-      def default_json_options(name:, fields: nil, only: nil, except: nil, methods: nil, allowed_methods: nil)
+      def default_json_options(name:, fields: nil, only: nil, except: nil, methods: nil, allowed_methods: nil, additional_fields: nil)
         # name ||= self.name.underscore.gsub('/', '_')
         # raise self.name.underscore.gsub('/', '_')
         # except ||= [:account_id, :agent, :ip]
 
         options = {}
         if fields && fields[name].present?
+          if additional_fields && additional_fields[name].present?
+            fields[name] += ",#{additional_fields[name]}"
+          end
           options[:only] = fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| !except&.include?(el) }
           if only.present?
             options[:only] = options[:only].find_all do |el|
@@ -41,6 +44,10 @@ module RenderJsonRails
           options[:except] = except
           options[:only] = only if only.present?
           options[:methods] = methods
+          if additional_fields && additional_fields[name].present? && allowed_methods
+            additional_methods = additional_fields[name].split(',').map{ |e| e.to_s.strip.to_sym }.find_all { |el| allowed_methods.include?(el) }
+            options[:methods] = (options[:methods] || []) | additional_methods
+          end
         end
         options
       end
@@ -49,7 +56,7 @@ module RenderJsonRails
         @render_json_config = config
       end
 
-      def render_json_options(includes: nil, fields: nil, override_render_json_config: nil, additional_config: nil)
+      def render_json_options(includes: nil, fields: nil, override_render_json_config: nil, additional_config: nil, additional_fields: nil)
         raise "należy skonfigurowac render_json metodą: render_json_config" if !defined?(@render_json_config)
 
         if override_render_json_config
@@ -73,7 +80,8 @@ module RenderJsonRails
           only: current_json_config[:only],
           except: current_json_config[:except],
           methods: current_json_config[:methods],
-          allowed_methods: current_json_config[:allowed_methods]
+          allowed_methods: current_json_config[:allowed_methods],
+          additional_fields: additional_fields
         )
 
         if includes
