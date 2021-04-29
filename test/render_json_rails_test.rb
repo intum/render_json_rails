@@ -174,6 +174,10 @@ class RenderJsonRailsTest < Minitest::Test
   end
 
   def test_additional_fields
+    out = DefaultFieldsModel.render_json_options # default_fields_model
+    expected = { only: [:id, :name], methods: [:calculated1] }
+    assert_equal expected, out, "out: #{out}"
+
     out = DefaultFieldsModel.render_json_options(
       additional_fields: { "default_fields_model" => "account_id,number,calculated2" }
     )
@@ -191,5 +195,31 @@ class RenderJsonRailsTest < Minitest::Test
     )
     expected = { only: [:id, :name], methods: [:calculated1, :calculated2] }
     assert_equal expected, out, "out: #{out}"
+  end
+
+  def test_find_render_json_options_class
+    object = nil
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_nil out
+
+    object = []
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_nil out
+
+    object = TestModel1.new
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_equal TestModel1, out
+
+    object = [TestModel1.new]
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_equal TestModel1, out
+
+    object = { a: TestModel1.new }
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_nil out
+
+    object = [1, TestModel1.new]
+    out = RenderJsonRails::Helper.find_render_json_options_class!(object)
+    assert_nil out
   end
 end

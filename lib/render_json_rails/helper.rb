@@ -18,23 +18,20 @@ module RenderJsonRails
     # fields[invoice_position]=price_gross
     # include=positions
     def render_json(object, override_render_json_config: nil, additional_config: nil, status: nil, location: nil)
-      raise "objekt nie moze byc null" if object == nil
 
-      if object.class.to_s.include?('ActiveRecord_Relation')
-        return render json: [] if !object[0]
-
-        class_object = object[0].class
+      if (class_object = RenderJsonRails::Helper.find_render_json_options_class!(object))
+        includes = params[:include].to_s.split(',').map { |el| el.to_s.strip } if params[:include]
+        options = class_object.render_json_options(
+          includes: includes,
+          fields: params[:fields],
+          override_render_json_config: override_render_json_config,
+          additional_config: additional_config,
+          additional_fields: params[:additional_fields]
+        )
       else
-        class_object = object.class
+        options = {}
       end
-      includes = params[:include].to_s.split(',').map { |el| el.to_s.strip } if params[:include]
-      options = class_object.render_json_options(
-        includes: includes,
-        fields: params[:fields],
-        override_render_json_config: override_render_json_config,
-        additional_config: additional_config,
-        additional_fields: params[:additional_fields]
-      )
+
       if params[:formatted] && !Rails.env.development? || params[:formatted] != 'no' && Rails.env.development?
         json = JSON.pretty_generate(object.as_json(options))
         render json: json, status: status, location: location
@@ -45,5 +42,21 @@ module RenderJsonRails
         render options
       end
     end
+
+    def self.find_render_json_options_class!(object)
+      return nil if object == nil
+
+      if object.class.respond_to?(:render_json_options)
+        object.class
+      # elsif object.is_a?(ActiveRecord::Base)
+      #   raise "klasa: #{object.class} nie ma konfiguracji 'render_json_config'"
+      elsif object.respond_to?(:first)
+        RenderJsonRails::Helper.find_render_json_options_class!(object[0])
+      else
+        nil
+      end
+
+    end
+
   end
 end
