@@ -76,9 +76,9 @@ include mogą być zagnieżdżane (po kropce)
 http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
 ```
 
-### additional_fields
+### Additional Fields
 
-aby wyświetlić domyślne pola oraz np. dodatkowe metody używamy `additional_fields` (dzięki temu nie trzeba wszystkich domyślnych pól gdy chcemy wyświetlić jakąś niedomyślną metodę)
+aby wyświetlić domyślne pola oraz np. dodatkowe metody używamy `additional_fields` (dzięki temu nie trzeba wypisywać wszystkich domyślnych pól, gdy chcemy wyświetlić dodatkową jakąś metodę z `allowed_methods`)
 
 ```html
 http://example.test/teams/1.json?additional_fields[user]=calculate_age # wyświetli wszystkie pole usera oraz dodatkowo `calculate_age`
