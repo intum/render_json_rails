@@ -67,13 +67,13 @@ http://example.test/teams/1.json?fields[team]=name,description
 i możemy łączyć to z include
 
 ```html
-http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&include=users
+http://example.test/teams/1.json?fields[team]=name,description&fields[user]=email,name&include=users
 ```
 
 include mogą być zagnieżdżane (po kropce)
 
 ```html
-http://example.text/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
+http://example.test/teams/1.json?fields[team]=name,description&fields[user]=email,name&fields[role]=name&include=users,users.roles
 ```
 
 ### Additional Fields
@@ -87,7 +87,7 @@ http://example.test/teams/1.json?additional_fields[user]=calculate_age # wyświe
  
 ## Wiecej przykładów użycia
 
-`http://xyz.test/data/9.json?formatted=yes&include=positions,positions.correction_before,positions.correction_after,department,invoice,invoices,invoice.positions&fields[invoice]=id,invoice_id,positions&fields[department]=name,id&fields[invoice_position]=id,name,tax`
+`http://example.test/data/9.json?formatted=yes&include=positions,positions.correction_before,positions.correction_after,department,invoice,invoices,invoice.positions&fields[invoice]=id,invoice_id,positions&fields[department]=name,id&fields[invoice_position]=id,name,tax`
 
 Więcej przykładów jest w testach: [test/render_json_rails_test.rb](test/render_json_rails_test.rb)
 
