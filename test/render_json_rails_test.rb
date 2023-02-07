@@ -222,4 +222,20 @@ class RenderJsonRailsTest < Minitest::Test
     out = RenderJsonRails::Helper.find_render_json_options_class!(object)
     assert_nil out
   end
+
+  def test_nested_additional_fields
+    out = TestModel2.render_json_options(
+      fields: { "model2" => " id ,account_id,name,calculated1" },
+      includes: ['test_model1'],
+      additional_fields: { "model1" => "calculated0" }
+    )
+    expected = {
+      only: [:id, :name],
+      methods: [:calculated1],
+      include: [
+        { test_model1: { except: [:account_id], methods: [:calculated0] } },
+      ],
+    }
+    assert_equal expected, out, "out: #{out}"
+  end
 end

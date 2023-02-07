@@ -89,7 +89,8 @@ module RenderJsonRails
           current_json_config[:includes]&.each do |model_name, klass|
             if includes.include?(model_name.to_s)
               includes2 = RenderJsonRails::Concern.includes_for_model(includes: includes, model: model_name.to_s)
-              include_options << { model_name => klass.render_json_options(includes: includes2, fields: fields) }
+              include_options << { model_name => klass.render_json_options(includes: includes2, fields: fields,
+                additional_fields: additional_fields) }
             end
           end
 
