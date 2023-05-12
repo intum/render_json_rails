@@ -84,7 +84,7 @@ aby wyświetlić domyślne pola oraz np. dodatkowe metody używamy `additional_f
 http://example.test/teams/1.json?additional_fields[user]=calculate_age # wyświetli wszystkie pole usera oraz dodatkowo `calculate_age`
 ```
 
- 
+
 ## Wiecej przykładów użycia
 
 `http://example.test/data/9.json?formatted=yes&include=positions,positions.correction_before,positions.correction_after,department,invoice,invoices,invoice.positions&fields[invoice]=id,invoice_id,positions&fields[department]=name,id&fields[invoice_position]=id,name,tax`
@@ -107,6 +107,15 @@ render_json_config name: :team,
    category: Category
   }
 ```
+Domyślnie wszystkie pola klasy są udostępniane. W kodzie możemy dodać jeden z parametrów:\
+except - lista pól które NIE zostaną wyświetlone w jsonie, wszystkie pozostałe pola będą widoczne\
+only - lista pól które zosataną wyświetlone, wszystkie pozostałe pola bedą ukryte\
+Domyślnie metody nie są wyświetlane i nie są dostępne przez api (dozwolone). Można to zmienić używając ponizszych parametrów:\
+methods - lista metod które bedą domyślnie wyświetlane (i dozwolone)
+allowed_methods - lista metod które są dozwolone, czyli możemy je wyświetlić korzystająć z additional_fields
+
+
+
 
 ## Installation
 
