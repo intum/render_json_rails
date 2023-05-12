@@ -113,8 +113,8 @@ only - lista pól które zosataną wyświetlone, wszystkie pozostałe pola bedą
 Domyślnie metody nie są wyświetlane i nie są dostępne przez api (dozwolone). Można to zmienić używając ponizszych parametrów:\
 methods - lista metod które bedą domyślnie wyświetlane (i dozwolone)
 allowed_methods - lista metod które są dozwolone, czyli możemy je wyświetlić korzystająć z additional_fields
-
-
+default_fields - domyślnie wyświetlane pola i metody. Metody muszą być wymienione w methods lub
+allowed_methods żeby zostac wyświetlone. Pola muszą być domyślnie wyświetlane (patrz except i only), żeby zostać wyświetlone.
 
 
 ## Installation
