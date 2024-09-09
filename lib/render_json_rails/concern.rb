@@ -99,6 +99,10 @@ module RenderJsonRails
 
         options = RenderJsonRails::Concern.deep_meld(options, additional_config) if additional_config
 
+        if options[:except].present?
+          options[:methods] = options[:methods]&.find_all { |el| !options[:except].include?(el) }
+        end
+
         options.delete(:methods) if options[:methods].blank?
 
         options

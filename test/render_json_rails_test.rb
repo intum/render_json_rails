@@ -238,4 +238,18 @@ class RenderJsonRailsTest < Minitest::Test
     }
     assert_equal expected, out, "out: #{out}"
   end
+
+  def test_except_in_additional_config_should_work_on_methods
+    out = DefaultFieldsModel.render_json_options
+    expected = { only: [:id, :name], methods: [:calculated1] }
+    assert_equal expected, out, "out: #{out}"
+
+    out = DefaultFieldsModel.render_json_options(
+      additional_config: {
+        except: [:calculated1]
+      }
+    )
+    expected = { only: [:id, :name], except: [:calculated1] }
+    assert_equal expected, out, "out: #{out}"
+  end
 end
