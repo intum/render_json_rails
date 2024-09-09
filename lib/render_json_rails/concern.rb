@@ -74,17 +74,11 @@ module RenderJsonRails
           fields[name] = current_json_config[:default_fields].join(',')
         end
 
-        if additional_config && additional_config[:except]
-          except = RenderJsonRails::Concern.meld(current_json_config[:except], additional_config[:except])
-        else
-          except = current_json_config[:except]
-        end
-
         options = default_json_options(
           name: name,
           fields: fields,
           only: current_json_config[:only],
-          except: except,
+          except: current_json_config[:except],
           methods: current_json_config[:methods],
           allowed_methods: current_json_config[:allowed_methods],
           additional_fields: additional_fields
@@ -105,6 +99,10 @@ module RenderJsonRails
 
         options = RenderJsonRails::Concern.deep_meld(options, additional_config) if additional_config
 
+        if options[:except].present?
+          options[:methods] = options[:methods]&.find_all { |el| !options[:except].include?(el) }
+        end
+
         options.delete(:methods) if options[:methods].blank?
 
         options
@@ -116,23 +114,19 @@ module RenderJsonRails
       includes.find_all { |el| el.present? }
     end
 
-    def self.meld(val1, val2)
-      if !val1.nil? && val2 == nil
-        val1
-      elsif val1 == nil && !val2.nil?
-        val2
-      elsif val1.is_a?(Array) && val2.is_a?(Array)
-        val1 | val2
-      elsif val1.is_a?(Hash) && val2.is_a?(Hash)
-        deep_meld(val1, val2)
-      else
-        [val1, val2]
-      end
-    end
-
     def self.deep_meld(hh1, hh2)
       hh1.deep_merge(hh2) do |_key, this_val, other_val|
-        self.meld(this_val, other_val)
+        if !this_val.nil? && other_val == nil
+          this_val
+        elsif this_val == nil && !other_val.nil?
+          other_val
+        elsif this_val.is_a?(Array) && other_val.is_a?(Array)
+          this_val | other_val
+        elsif this_val.is_a?(Hash) && other_val.is_a?(Hash)
+          deep_meld(this_val, other_val)
+        else
+          [this_val, other_val]
+        end
       end
     end
   end
