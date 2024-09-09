@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Marcin"]
   spec.email         = ["marcin@radgost.com"]
 
-  spec.summary       = "Simle JSON API render like JonApi"
+  spec.summary       = "Simple JSON API render like JsonApi"
   spec.description   = "render json with 'includes' and 'fields' with simple config"
   spec.homepage      = "https://github.com/intum/render_json_rails"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
